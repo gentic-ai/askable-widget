@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Askable Widget - Programmatic Initialization</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+    }
+    .controls {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    button {
+      background: #4facfe;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 10px 10px 0;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #00f2fe;
+    }
+    button.destroy {
+      background: #f5576c;
+    }
+    button.destroy:hover {
+      background: #f093fb;
+    }
+    code {
+      background: #e8e8e8;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Askable Widget - Programmatic Initialization</h1>
+  
+  <div class="controls">
+    <h2>Control the Widget</h2>
+    <p>Use these buttons to interact with the widget programmatically:</p>
+    <button onclick="openWidget()">Open & Start Voice Session</button>
+    <button onclick="destroyWidget()" class="destroy">Destroy Widget</button>
+    <button onclick="recreateWidget()">Recreate Widget</button>
+  </div>
+
+  <h2>How It Works</h2>
+  <p>This example shows how to initialize and control the widget using JavaScript:</p>
+  
+  <pre><code>// Initialize widget programmatically
+const widget = window.initAskableWSWidget({
+  siteId: 'YOUR_SITE_ID',
+  position: 'bottom-right',
+  language: 'en'
+});
+
+// Open widget and start voice session
+widget.openAndStart();
+
+// Destroy widget
+widget.destroy();</code></pre>
+
+  <p><strong>Note:</strong> Replace <code>YOUR_SITE_ID</code> with your actual site ID in the script below.</p>
+
+  <!-- Load Askable Widget Script -->
+  <script src="https://askable.gentic.in/versions/latest/askable-ws.js"></script>
+  
+  <script>
+    let widgetInstance = null;
+
+    // Initialize widget when page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      widgetInstance = window.initAskableWSWidget({
+        siteId: 'YOUR_SITE_ID', // Replace with your actual site ID
+        position: 'bottom-right',
+        language: 'en'
+      });
+    });
+
+    function openWidget() {
+      if (widgetInstance) {
+        widgetInstance.openAndStart();
+      } else {
+        alert('Widget not initialized. Please refresh the page.');
+      }
+    }
+
+    function destroyWidget() {
+      if (widgetInstance) {
+        widgetInstance.destroy();
+        widgetInstance = null;
+        alert('Widget destroyed. Click "Recreate Widget" to bring it back.');
+      }
+    }
+
+    function recreateWidget() {
+      if (widgetInstance) {
+        widgetInstance.destroy();
+      }
+      widgetInstance = window.initAskableWSWidget({
+        siteId: 'YOUR_SITE_ID', // Replace with your actual site ID
+        position: 'bottom-right',
+        language: 'en'
+      });
+      alert('Widget recreated!');
+    }
+  </script>
+</body>
+</html>
