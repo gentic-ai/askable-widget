@@ -288,47 +288,63 @@ The Askable widget requires specific CSP directives to function properly. Config
 
 ### Required CSP Directives
 
+**For Best Performance (AudioWorklet - Recommended):**
 ```http
 Content-Security-Policy: 
   script-src 'self' https://askable.gentic.in;
   connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in;
-  media-src 'self' blob:;
-  worker-src 'self' blob:;
-  child-src 'self' blob:;
+  worker-src 'self' https://askable.gentic.in;
+```
+
+**For Maximum Compatibility (ScriptProcessorNode Fallback):**
+```http
+Content-Security-Policy: 
+  script-src 'self' https://askable.gentic.in;
+  connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in;
 ```
 
 **Note:** The widget itself doesn't require `unsafe-inline` or `unsafe-eval`. However, if your website uses inline scripts or `eval()`, you may need to add these directives. For better security, consider using nonces or hashes for inline scripts instead.
 
-### About `blob:` URLs in CSP
+### Audio Processing Implementation (v0.2.0)
 
-The widget uses `blob:` URLs for:
-- **`worker-src blob:`** - **REQUIRED** - AudioWorklet processor is loaded from a blob URL created from inline code
-- **`media-src blob:`** - Audio playback buffers created from WebSocket audio data (may be required by some browsers)
-- **`child-src blob:`** - Browser-internal audio processing contexts (may be required by some browsers)
+The widget uses a **hybrid approach** for audio processing:
+
+1. **Primary Method (AudioWorklet)**: 
+   - Uses `audio-processor.js` file (separate file, not blob URL)
+   - Processes audio in a separate thread for better performance
+   - Requires `worker-src` CSP directive
+   - Automatically used when available and CSP allows it
+
+2. **Fallback Method (ScriptProcessorNode)**:
+   - Processes audio in main thread
+   - No `worker-src` CSP directive required
+   - Automatically used when AudioWorklet is unavailable or blocked by CSP
+   - Maximum compatibility with strict CSP policies
+
+**Benefits:**
+- ✅ **No `blob:` URLs required** - Uses separate file instead of blob URLs
+- ✅ **Better performance** - AudioWorklet runs in separate thread when available
+- ✅ **Automatic fallback** - Works with strict CSP policies that cannot allow `worker-src`
+- ✅ **Future-proof** - Uses modern API when possible, maintains compatibility
+
+**Deployment:**
+- Deploy `audio-processor.js` alongside widget script for best performance
+- File should be accessible at `/audio-processor.js` or same path as widget script
+- Widget works without processor file (uses ScriptProcessorNode fallback)
 
 **Security Considerations:**
 
-1. **`blob:` is NOT used for scripts** - The widget never loads scripts from blob URLs. However, the AudioWorklet processor code is embedded inline and loaded via a blob URL.
+1. **No `blob:` URLs required** - The widget uses a separate file (`audio-processor.js`) instead of blob URLs, eliminating the need for `blob:` in CSP directives.
 
-2. **Risk level by directive:**
-   - **`script-src blob:`** - ❌ **HIGH RISK** - Never allow this. Blob URLs inherit your origin and can execute arbitrary code.
-   - **`worker-src blob:`** - ⚠️ **REQUIRED** - The widget creates the AudioWorklet processor code inline and loads it via `URL.createObjectURL(new Blob([...code...]))`. This requires `blob:` in `worker-src`.
-   - **`media-src blob:`** - ⚠️ **MODERATE RISK** - May be required for audio playback. Blob URLs are created by the browser for MediaStream and AudioBuffer objects.
-   - **`child-src blob:`** - ⚠️ **MODERATE RISK** - May be needed for iframes or workers created by the browser.
+2. **`worker-src` directive:**
+   - ✅ **Required for AudioWorklet** - If you want best performance, add `worker-src 'self' https://askable.gentic.in`
+   - ✅ **Optional for compatibility** - Widget works without it (uses ScriptProcessorNode fallback)
+   - ✅ **More secure than `blob:`** - Uses separate file instead of inline blob code
 
-3. **Why it's relatively safe for this widget:**
-   - The widget doesn't create blob URLs from user input
-   - AudioWorklet code is embedded in the widget script (not user-controlled)
-   - Audio buffers are created from WebSocket data (server-controlled)
-   - No script execution from blob URLs (only worker code)
-
-4. **Required CSP directives:**
-   - ✅ **`worker-src blob:`** - **MANDATORY** - Required for AudioWorklet to function
-   - ✅ **`media-src blob:`** - **RECOMMENDED** - Required for audio playback in most browsers
-   - ✅ **`child-src blob:`** - **RECOMMENDED** - May be required for browser-internal contexts
-   - ❌ **`script-src blob:`** - **NEVER ALLOW** - This would be a security risk
-
-**Note:** The widget will not function without `worker-src blob:` as the AudioWorklet processor must be loaded from a blob URL.
+3. **CSP flexibility:**
+   - Websites with strict CSP policies that cannot allow `worker-src` will automatically use ScriptProcessorNode
+   - Websites that can allow `worker-src` will get better performance with AudioWorklet
+   - No breaking changes - existing deployments continue to work
 
 ### Platform-Specific CSP Configuration
 

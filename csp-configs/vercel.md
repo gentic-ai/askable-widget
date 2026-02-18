@@ -14,13 +14,15 @@ Create or update `vercel.json` in your project root:
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "script-src 'self' https://askable.gentic.in  ; connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in; media-src 'self' blob:; worker-src 'self' blob:; child-src 'self' blob:;"
+          "value": "script-src 'self' https://askable.gentic.in; connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in; worker-src 'self' https://askable.gentic.in;"
         }
       ]
     }
   ]
 }
 ```
+
+**Note:** For best performance, include `worker-src` to enable AudioWorklet. For maximum compatibility with strict CSP policies, you can omit `worker-src` and the widget will automatically use ScriptProcessorNode fallback.
 
 ## Method 2: Using Next.js Headers API (Next.js 13+)
 
@@ -37,11 +39,9 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy',
             value: [
-              "script-src 'self' https://askable.gentic.in  ",
+              "script-src 'self' https://askable.gentic.in",
               "connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in",
-              "media-src 'self' blob:",
-              "worker-src 'self' blob:",
-              "child-src 'self' blob:"
+              "worker-src 'self' https://askable.gentic.in"
             ].join('; ')
           }
         ]
@@ -66,7 +66,7 @@ export function middleware(request: NextRequest) {
   
   response.headers.set(
     'Content-Security-Policy',
-    "script-src 'self' https://askable.gentic.in  ; connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in; media-src 'self' blob:; worker-src 'self' blob:; child-src 'self' blob:;"
+    "script-src 'self' https://askable.gentic.in; connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in; worker-src 'self' https://askable.gentic.in;"
   );
   
   return response;
@@ -89,7 +89,7 @@ For stricter security, use nonce-based CSP:
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "script-src 'self' https://askable.gentic.in  'nonce-{NONCE}'; connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in; media-src 'self' blob:; worker-src 'self' blob:; child-src 'self' blob:;"
+          "value": "script-src 'self' https://askable.gentic.in 'nonce-{NONCE}'; connect-src 'self' https://askable.gentic.in wss://askable.gentic.in wss://*.askable.gentic.in; worker-src 'self' https://askable.gentic.in;"
         }
       ]
     }
