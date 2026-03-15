@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Askable Widget - Voice Form Example</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    h1 { color: #333; margin-top: 0; }
+    .form-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 640px) {
+      .form-section { grid-template-columns: 1fr; }
+    }
+    .form-card {
+      background: #f9f9f9;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #eee;
+    }
+    .form-card h2 { margin-top: 0; font-size: 1.25rem; }
+    .form-card label { display: block; margin-bottom: 4px; font-weight: 500; }
+    .form-card input,
+    .form-card textarea {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .form-card button {
+      background: #4facfe;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .form-card button:hover { background: #3a9ae8; }
+    .widget-column {
+      background: #f0f7ff;
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid #cce0ff;
+    }
+    .widget-column h2 { margin-top: 0; font-size: 1.25rem; }
+    .widget-column p { margin-bottom: 16px; color: #555; }
+    #askable-embed-container { min-height: 120px; }
+    .info {
+      background: #f5f5f5;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    code { background: #e8e8e8; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h1>Voice Form Example</h1>
+
+  <div class="info">
+    <strong>Embed Voice Forms (v0.2.0):</strong> This page shows a contact form and the Askable widget in voice-form mode.
+    Click the mic, and the agent will ask for each field and fill the form live as you speak. When all required fields are
+    collected, the agent submits the form. Replace <code>YOUR_SITE_ID</code> with your Askable site ID.
+  </div>
+
+  <div class="form-section">
+    <div class="form-card">
+      <h2>Contact / lead form</h2>
+      <form id="contact-form">
+        <label for="name">Name</label>
+        <input type="text" name="firstName" id="name" placeholder="Your name" required />
+        <label for="email">Work email</label>
+        <input type="email" name="email" id="email" placeholder="you@company.com" required />
+        <label for="company">Company (optional)</label>
+        <input type="text" name="company" id="company" placeholder="Company name" />
+        <label for="message">Message (optional)</label>
+        <textarea name="message" id="message" rows="3" placeholder="How can we help?"></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+    <div class="widget-column">
+      <h2>Fill by voice</h2>
+      <p>Use the mic to say your name, email, and other details. The form will update in real time and submit when the agent has everything.</p>
+      <div id="askable-embed-container"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var form = e.target;
+      var data = {
+        firstName: form.elements.namedItem('firstName').value,
+        email: form.elements.namedItem('email').value,
+        company: form.elements.namedItem('company').value,
+        message: form.elements.namedItem('message').value
+      };
+      console.log('Form submitted:', data);
+      alert('Form submitted!\n\n' + JSON.stringify(data, null, 2));
+    });
+  </script>
+  <script
+    src="https://askable.gentic.in/versions/latest/askable-ws.js"
+    data-site-id="YOUR_SITE_ID"
+    data-widget-type="ws"
+    data-embed="true"
+    data-embed-container="#askable-embed-container"
+    data-form-id="contact-form"
+    data-language="en"
+    data-size="medium"
+    data-label="Fill form by voice"
+  ></script>
+</body>
+</html>

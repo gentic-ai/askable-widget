@@ -1,6 +1,6 @@
 # Askable Widget Documentation
 
-Add voice AI to your website in minutes with the Askable WebSocket Widget.
+Add voice AI to your website in minutes with the Askable's Voice AI Agent Widget. This doc covers the latest features including **embeddable voice forms** (fill and submit forms by voice) and **theme customization** (size, label, and agent-level colors and status text) from v0.2.0.
 
 ## Quick Start
 
@@ -134,6 +134,12 @@ Configure the widget using data attributes on the script tag:
 | `data-language` | No | `en` | Language code (e.g., `en`, `hi`, `ta`, `es`, `fr`) |
 | `data-auto-open` | No | `false` | Auto-open widget after page load |
 | `data-auto-open-delay` | No | `0` | Delay in milliseconds before auto-opening |
+| `data-embed` | No | `false` | When `"true"`, render the widget inline inside a container instead of as a floating corner widget |
+| `data-embed-container` | No | `auto` | CSS selector for the container to render into when `data-embed="true"`; `"auto"` uses a reasonable default near the script tag |
+| `data-form-id` | No | - | **Embed Voice Forms:** Form ID or CSS selector (e.g. `contact-form` or `#contact-form`) to attach the widget to. When set, the agent collects the form’s fields by voice and fills them live; when done, it submits the form. See [Embed Voice Forms](#embed-voice-forms). |
+| `data-size` | No | `medium` | Mic button size: `small`, `medium`, or `large` (see [Theme & customization](#theme--customization-v020)) |
+| `data-label` | No | `Start voice` | Accessible label (and optional visible label) for the mic button |
+| `data-theme` | No | - | Theme hint for widget styling (e.g. `light`, `dark`, `auto`) |
 
 ### Example with All Options
 
@@ -147,6 +153,9 @@ Configure the widget using data attributes on the script tag:
   data-language="en"
   data-auto-open="true"
   data-auto-open-delay="3000"
+  data-embed="false"
+  data-size="medium"
+  data-label="Talk to our AI agent"
 ></script>
 ```
 
@@ -240,6 +249,36 @@ Configure the WebSocket connection timeout (default: 30 seconds):
 <script src="https://askable.gentic.in/versions/latest/askable-ws.js" ...></script>
 ```
 
+### Theme & Customization (v0.2.0)
+
+The WebSocket widget supports **script-level** and **agent-level** customization so you can align the widget with your brand and page layout.
+
+**Script attributes (per page):**
+
+- **`data-size`** — Mic button size: `small`, `medium`, or `large`. Use a smaller size on dense layouts and a larger one for hero or CTA sections.
+- **`data-label`** — Accessible label and optional visible text for the mic button (e.g. "Talk to our AI", "Fill form by voice").
+- **`data-theme`** — Optional theme hint (e.g. `light`, `dark`, `auto`) for status text and background styling.
+
+**Agent-level (Askable dashboard):**
+
+When you configure your agent in the Askable dashboard, you can set:
+
+- **Primary color** — Used for the mic button and accent (e.g. brand color). The widget receives this via the voice proxy and applies it automatically.
+- **Status texts** — Custom copy for each state: idle ("Click to speak"), connecting, listening, speaking, timeout, submitting, done. Configure these in the agent's `configuration.widgetUi.statusTexts` so the same agent shows consistent, branded copy across all sites that embed it.
+
+Example script tag with customization:
+
+```html
+<script
+  src="https://askable.gentic.in/versions/latest/askable-ws.js"
+  data-site-id="YOUR_SITE_ID"
+  data-widget-type="ws"
+  data-size="large"
+  data-label="Talk to our AI"
+  data-theme="light"
+></script>
+```
+
 ### Public API Methods
 
 After initialization, the widget instance is available at `window.askableWSWidget`:
@@ -257,6 +296,68 @@ window.askableWSWidget.destroy();
 ### Basic HTML Page
 
 See [`examples/html/basic.html`](./examples/html/basic.html) for a complete example.
+
+### Voice Form (HTML)
+
+See [`examples/html/voice-form.html`](./examples/html/voice-form.html) for a contact form with the widget in voice-form mode: users can fill and submit the form by speaking.
+
+### Inline Embed (In-Page CTA)
+
+To embed the widget directly inside a section of your page (for example, next to a lead form or in a hero card), use `data-embed="true"` and point `data-embed-container` to a DOM element:
+
+```html
+<div id="askable-embed-container"></div>
+
+<script
+  src="https://askable.gentic.in/versions/latest/askable-ws.js"
+  data-site-id="YOUR_SITE_ID"
+  data-widget-type="ws"
+  data-embed="true"
+  data-embed-container="#askable-embed-container"
+  data-language="en"
+  data-size="medium"
+  data-label="Talk to our AI agent"
+></script>
+```
+
+In embed mode, the widget renders inline inside the chosen container and does not use floating/scroll-based behavior.
+
+## Embed Voice Forms
+
+Attach a voice agent to **any existing form** so users can fill and submit it by speaking. Add one script tag with `data-form-id` pointing to your form’s `id` (or CSS selector). Your form and submit handler stay unchanged.
+
+**Requirements:** Give your form an `id` (e.g. `id="contact-form"`). Ensure each field in the form the agent should collect has a `name` attribute (`input`, `select`, `textarea`) and/or a `label` attribute.
+
+### Attach with a script tag
+
+Add the Askable script with **`data-form-id`** set to your form’s `id` or a CSS selector. Use **`data-embed="true"`** and **`data-embed-container`** to render the mic inline (e.g. next to the form), or omit them for the default floating widget.
+
+```html
+<!-- Your existing form (unchanged) -->
+<form id="contact-form">
+  <input type="text" name="firstName" placeholder="Name" required />
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="text" name="company" placeholder="Company (optional)" />
+  <button type="submit">Submit</button>
+</form>
+
+<!-- Container for the voice widget (when using inline embed) -->
+<div id="askable-embed-container"></div>
+
+<script
+  src="https://askable.gentic.in/versions/latest/askable-ws.js"
+  data-site-id="YOUR_SITE_ID"
+  data-widget-type="ws"
+  data-embed="true"
+  data-embed-container="#askable-embed-container"
+  data-form-id="contact-form"
+  data-label="Fill form by voice"
+></script>
+```
+
+Replace `YOUR_SITE_ID` with your Askable site ID. The agent will collect the form fields by voice, fill them live, and submit the form when done; your existing `submit` handler and validation run as usual.
+
+**Full example:** [`examples/html/voice-form.html`](./examples/html/voice-form.html).
 
 ### HTML with SRI (Subresource Integrity)
 
@@ -438,11 +539,20 @@ If you see errors like "Failed to find a valid digest in the 'integrity' attribu
 ```typescript
 interface AskableWidgetConfig {
   siteId: string;                    // Required: Your site/agent ID
-  apiBaseUrl?: string;                // Optional: API endpoint URL
+  apiBaseUrl?: string;               // Optional: API endpoint URL
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
   language?: string;                  // Optional: Language code
   autoOpen?: boolean;                 // Optional: Auto-open widget
-  autoOpenDelayMs?: number;           // Optional: Delay before auto-opening
+  autoOpenDelayMs?: number;          // Optional: Delay before auto-opening
+  // Embed mode configuration (inline CTA)
+  embed?: boolean;                   // Optional: When true, render inline instead of as a floating widget
+  embedContainer?: string;           // Optional: CSS selector for the container when embed=true
+  // Embed Voice Forms: attach to a form and fill it by voice (live field updates + auto-submit when done)
+  formId?: string;                   // Optional: Form id or CSS selector (e.g. "contact-form" or "#contact-form")
+  // Theme & customization (v0.2.0)
+  theme?: string;                    // Optional: Theme hint (e.g. "light", "dark", "auto")
+  size?: 'small' | 'medium' | 'large'; // Optional: Mic button size preset
+  label?: string;                    // Optional: Accessible label for the mic button
 }
 ```
 
