@@ -583,7 +583,7 @@ For issues, questions, or feature requests:
 
 - **Support**: [dev-forum@askable.gentic.in](mailto:dev-forum@askable.gentic.in)
 - **GitHub Issues**: [https://github.com/askable/widget-docs/issues](https://github.com/askable/widget-docs/issues)
-- **Documentation**: [https://docs.askable.gentic.in](https://docs.askable.gentic.in)
+- **Documentation**: [https://docs.gentic.in](https://docs.gentic.in)
 
 ## License
 
