@@ -1,10 +1,10 @@
 # Askable Widget Documentation
 
-Add voice AI to your website in minutes with the Askable's Voice AI Agent Widget. This doc covers the latest features including **embeddable voice forms** (fill and submit forms by voice) and **theme customization** (size, label, and agent-level colors and status text) from v0.2.0.
+Add text and voice AI agents to your website in minutes with Askable widgets. Use `askable-ws-multi` for text-first agents with optional voice, attachments, workflow updates, screen share and live video, or use `askable-ws` for voice-first experiences and embeddable voice forms.
 
 ## Quick Start
 
-Add the Askable widget to your website by including this script tag before the closing `</body>` tag:
+Add the Askable voice widget to your website by including this script tag before the closing `</body>` tag:
 
 ```html
 <script
@@ -179,6 +179,114 @@ You can also initialize the widget programmatically using JavaScript:
   // widget.destroy();
 </script>
 ```
+
+## Text Agents (`askable-ws-multi`)
+
+Use `askable-ws-multi` to add a text-first AI agent to your website. The widget supports streamed text responses, optional voice mode, file attachments, workflow progress, panel and floating-chat layouts, themes, and resumable sessions.
+
+### Quick Start
+
+Add the script before the closing `</body>` tag:
+
+```html
+<script
+  src="https://askable.gentic.in/askable-ws-multi.js"
+  data-widget="askable-ws-multi"
+  data-site-id="YOUR_SITE_ID"
+  data-api-base-url="https://askable.gentic.in"
+  data-layout="panel"
+  data-interaction-mode="text"
+  data-embed="false"
+  data-start-collapsed="true"
+></script>
+```
+
+Replace `YOUR_SITE_ID` with your site or agent ID from the Askable dashboard. This example starts as a floating chat button and opens the text agent when selected.
+
+### Script Tag Attributes
+
+| Attribute | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `data-widget` | Yes | - | Must be `askable-ws-multi` |
+| `data-site-id` | Yes | - | Your Askable site or agent ID |
+| `data-api-base-url` | No | Current origin | Askable API origin |
+| `data-language` | No | `en` | Agent language code |
+| `data-layout` | No | `panel` | `panel` or `chat` |
+| `data-interaction-mode` | No | `text` | Initial mode: `text` or `voice` |
+| `data-embed` | No | `false` | `true` creates a desktop split pane; `false` uses an overlay |
+| `data-embed-container` | No | Auto-created | CSS selector for a custom embed container |
+| `data-start-collapsed` | No | Responsive | `true` starts with only the floating chat button |
+| `data-panel-top-offset` | No | `0` | Top offset in pixels for an overlay panel |
+| `data-theme` | No | `dashboard` | `shadcn`, `material`, `dashboard`, `modern`, or `custom` |
+| `data-custom-css` | No | - | CSS overrides applied inside the widget |
+| `data-enable-live-video` | No | `false` | Enables camera and screen-sharing controls |
+
+### Layouts and Mobile Behavior
+
+For the most reliable floating widget across desktop and mobile, use:
+
+```html
+data-embed="false"
+data-start-collapsed="true"
+```
+
+This avoids changing the host page layout and starts with a chat button. Expanding the widget opens a docked panel on larger screens and a full-screen panel on smaller screens.
+
+For a side-by-side desktop layout, use `data-embed="true"`. Askable then wraps the page content and creates a panel column on the right. Use this only when the host page should participate in the split layout.
+
+To use the floating chat window instead of the panel layout:
+
+```html
+<script
+  src="https://askable.gentic.in/askable-ws-multi.js"
+  data-widget="askable-ws-multi"
+  data-site-id="YOUR_SITE_ID"
+  data-api-base-url="https://askable.gentic.in"
+  data-layout="chat"
+  data-interaction-mode="text"
+  data-embed="false"
+></script>
+```
+
+### Programmatic Initialization
+
+Load the bundle and initialize the widget manually when its configuration depends on your application state:
+
+```html
+<script src="https://askable.gentic.in/askable-ws-multi.js"></script>
+<script>
+  const widget = window.initAskableWSMultiWidget({
+    siteId: 'YOUR_SITE_ID',
+    apiBaseUrl: 'https://askable.gentic.in',
+    layout: 'panel',
+    defaultInteractionMode: 'text',
+    embed: false,
+    startCollapsed: true,
+    themeId: 'dashboard'
+  });
+
+  widget.init();
+
+  // Later:
+  // widget.destroy();
+</script>
+```
+
+### Capabilities
+
+- **Text and voice:** Visitors can switch between text and voice modes when enabled.
+- **Attachments:** JPEG, PNG, WebP, WAV, MP3, WebM, and MP4 files up to 20 MB.
+- **Workflow status:** Displays progress from agent tools and workflows.
+- **Live video:** Optional camera or screen sharing with `data-enable-live-video="true"`.
+- **Session resume:** Idle sessions can reconnect and resume when the agent session policy permits it.
+- **Themes:** Preset themes use Askable design tokens; `custom` supports operator-provided CSS.
+
+### Domain and Security Requirements
+
+- Add every host origin that embeds the widget to the agent's `allowedDomains`.
+- Serve the host page over HTTPS when using voice, camera, or screen sharing.
+- Allow `https://askable.gentic.in` in `script-src` and `connect-src`.
+- Allow `wss://askable.gentic.in` in `connect-src`.
 
 ## Advanced Configuration
 
@@ -581,9 +689,9 @@ class AskableWSWidget {
 
 For issues, questions, or feature requests:
 
+- **Documentation**: [https://docs.askable.gentic.in](https://docs.askable.gentic.in)
 - **Support**: [dev-forum@askable.gentic.in](mailto:dev-forum@askable.gentic.in)
 - **GitHub Issues**: [https://github.com/askable/widget-docs/issues](https://github.com/askable/widget-docs/issues)
-- **Documentation**: [https://docs.gentic.in](https://docs.gentic.in)
 
 ## License
 
