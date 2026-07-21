@@ -689,7 +689,6 @@ class AskableWSWidget {
 
 For issues, questions, or feature requests:
 
-- **Documentation**: [https://docs.askable.gentic.in](https://docs.askable.gentic.in)
 - **Support**: [dev-forum@askable.gentic.in](mailto:dev-forum@askable.gentic.in)
 - **GitHub Issues**: [https://github.com/askable/widget-docs/issues](https://github.com/askable/widget-docs/issues)
 
